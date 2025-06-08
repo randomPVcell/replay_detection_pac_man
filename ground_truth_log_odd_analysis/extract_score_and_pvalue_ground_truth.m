@@ -18,6 +18,17 @@ if strcmp(method,'path')   %path finding, pac-man method
             replay_scores.SECOND_HALF(track,event) = scored_replay2(track).replay_events(event).path_score;
         end
     end
+elseif strcmp(method,'path_new')     
+    for track = 1 :  number_of_tracks % for each track
+        for event = 1 : number_of_events %for each event
+            p_values.WHOLE(track,event,:) = scored_replay(track).replay_events(event).p_value_path_new;
+            replay_scores.WHOLE(track,event) = scored_replay(track).replay_events(event).path_score_normalised;
+            p_values.FIRST_HALF(track,event,:) = scored_replay1(track).replay_events(event).p_value_path_new;
+            replay_scores.FIRST_HALF(track,event) = scored_replay1(track).replay_events(event).path_score_normalised;
+            p_values.SECOND_HALF(track,event,:) = scored_replay2(track).replay_events(event).p_value_path_new;
+            replay_scores.SECOND_HALF(track,event) = scored_replay2(track).replay_events(event).path_score_normalised;
+        end
+    end
     
 elseif strcmp(method,'wcorr') %weighted correlation method
     for track = 1 :  number_of_tracks % for each track

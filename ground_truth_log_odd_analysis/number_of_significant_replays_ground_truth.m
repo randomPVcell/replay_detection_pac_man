@@ -9,10 +9,14 @@ function [significant_replay_events sig_event_info] = number_of_significant_repl
 %     method: method of analysis. 'path' for path finding/pacman, 'wcorr' for weighted correlation; 'linear' for linear fit and 'spearman' for spearman correlation 
 %     rexposure_option: 
 
-
+if strcmp(method, 'path_new')
+    load scored_replay_path
+    load scored_replay_segments_path
 % Load and set variables
-load scored_replay_segments
-load scored_replay
+else
+    load scored_replay_segments
+    load scored_replay
+end
 load extracted_replay_events
 load extracted_position
 load extracted_sleep_state
@@ -38,12 +42,16 @@ end
 
 % Find indices of replay events with ripple power above threshold
 replay_above_rippleThresh_index = find(replay.ripple_peak >= ripple_zscore_threshold);
-
+if strcmp(method, 'path_new')
+    [p_values, replay_scores] = extract_score_and_pvalue(scored_replay_path, scored_replay1_path, scored_replay2_path, method, replay_above_rippleThresh_index);
+    number_of_tracks = length(scored_replay_path);
+    number_of_events = length(replay_above_rippleThresh_index);
+else
 %extract replay score (e.g. wcorr value) and p value for each shuffle and event segment (whole, first, second) and for each track
-[p_values, replay_scores] = extract_score_and_pvalue(scored_replay, scored_replay1, scored_replay2, method, replay_above_rippleThresh_index);
-number_of_tracks = length(scored_replay);
-number_of_events = length(replay_above_rippleThresh_index);
-
+    [p_values, replay_scores] = extract_score_and_pvalue(scored_replay, scored_replay1, scored_replay2, method, replay_above_rippleThresh_index);
+    number_of_tracks = length(scored_replay);
+    number_of_events = length(replay_above_rippleThresh_index);
+end
 %create variable significant_replay_event that contains all information related to replay events judged significant (for each track) with this function
 significant_replay_events.p_value_threshold = p_value_threshold;
 significant_replay_events.ripple_zscore_threshold = ripple_zscore_threshold;
@@ -320,6 +328,12 @@ switch method
         else
             save significant_replay_events_path significant_replay_events
         end        
+    case 'path_new'
+        if ~isempty(rexposure_option) && rexposure_option == 2
+            save significant_replay_events_path_new_individual_exposures significant_replay_events
+        else
+            save significant_replay_events_path_new significant_replay_events
+        end
     case 'linear'
         if ~isempty(rexposure_option) && rexposure_option == 2
             save significant_replay_events_linear_individual_exposures significant_replay_events
@@ -348,6 +362,18 @@ if strcmp(method,'path')   %path finding, pac-man method
             replay_scores.FIRST_HALF(track,event) = scored_replay1(track).replay_events(event).path_score;
             p_values.SECOND_HALF(track,event,:) = scored_replay2(track).replay_events(event).p_value_path;
             replay_scores.SECOND_HALF(track,event) = scored_replay2(track).replay_events(event).path_score;
+        end
+    end
+
+elseif strcmp(method,'path_new')     
+    for track = 1 :  number_of_tracks % for each track
+        for event = 1 : number_of_events %for each event
+            p_values.WHOLE(track,event,:) = scored_replay(track).replay_events(event).p_value_path_new;
+            replay_scores.WHOLE(track,event) = scored_replay(track).replay_events(event).path_score_normalised;
+            p_values.FIRST_HALF(track,event,:) = scored_replay1(track).replay_events(event).p_value_path_new;
+            replay_scores.FIRST_HALF(track,event) = scored_replay1(track).replay_events(event).path_score_normalised;
+            p_values.SECOND_HALF(track,event,:) = scored_replay2(track).replay_events(event).p_value_path_new;
+            replay_scores.SECOND_HALF(track,event) = scored_replay2(track).replay_events(event).path_score_normalised;
         end
     end
     

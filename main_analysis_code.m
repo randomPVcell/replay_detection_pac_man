@@ -3,8 +3,8 @@
 
 clear all
 
-% workingDir = 'P:\ground_truth_replay_analysis\Dropbo_data8_normalised_within';
-workingDir = 'P:\ground_truth_replay_analysis\Dropbo_data8';
+% workingDir = 'D:\ground_truth_replay_analysis\Dropbo_data8_normalised_within';
+workingDir = 'D:\public-archivedwl-90\Dropbo_data8';
 
 % cd P:\ground_truth_replay_analysis\Dropbo_data8_normalised_within\;
 cd(workingDir)

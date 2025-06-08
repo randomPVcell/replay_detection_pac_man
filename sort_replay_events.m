@@ -26,6 +26,16 @@ else
                 disp('spearman not found, loading default')
                 load significant_replay_events;
             end
+        case 'path_new'
+            if exist('significant_replay_events_path_new.mat')==2
+                load(fullfile(pwd, 'significant_replay_events_path_new.mat'));
+            elseif exist('significant_replay_events_path_new_individual_exposure.mat')==2
+                load(fillfile(pwd, 'significant_replay_events_path_new_individual_exposure.mat'));
+            else
+                disp('path_new not found, loading default')
+                load significant_replay_events;
+            end
+
         case 'control_fixed_spike'
             if exist('significant_replay_events_wcorr_FIXED.mat')==2
                 load significant_replay_events_wcorr_FIXED

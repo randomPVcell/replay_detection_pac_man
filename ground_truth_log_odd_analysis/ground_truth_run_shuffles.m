@@ -197,12 +197,12 @@ for s=1:num_shuffles
         end
     end
     %score replay for decoded events with shuffled place fields
-    shuffle_output=replay_scoring(shuffled_struct,analysis_type);  %don't do shuffle for spearman
+    shuffle_output=replay_scoring_new(shuffled_struct,analysis_type);  %don't do shuffle for spearman
     for track = 1 : num_tracks
         for event = 1: num_replay_events
-            shuffled_track(track).replay_events(event).linear_score(s) = shuffle_output(track).replay_events(event).linear_score;
-            shuffled_track(track).replay_events(event).weighted_corr_score(s) = shuffle_output(track).replay_events(event).weighted_corr_score;
-            shuffled_track(track).replay_events(event).path_score(s) = shuffle_output(track).replay_events(event).path_score;
+            %shuffled_track(track).replay_events(event).linear_score(s) = shuffle_output(track).replay_events(event).linear_score;
+            %shuffled_track(track).replay_events(event).weighted_corr_score(s) = shuffle_output(track).replay_events(event).weighted_corr_score;
+            shuffled_track(track).replay_events(event).path_score_normalised(s) = shuffle_output(track).replay_events(event).path_score_normalised;
         end
         
     end
