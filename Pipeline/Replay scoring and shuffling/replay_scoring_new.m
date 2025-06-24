@@ -1,5 +1,5 @@
 
-function scored_replay = replay_scoring_new(data,analysis_type)
+function scored_replay = replay_scoring_new(data,analysis_type,suffix)
 %scores replay events using several measures- line fitting, weighted
 %correlation, "pac-man" path finding, and spearman correlation coefficient.
 %modify_decoding.m subroutine is run to zero probability if no spikes from
@@ -26,12 +26,7 @@ num_replay_events = length(data(1).replay_events);
 
 for track = 1 : num_tracks
     for event = 1 : num_replay_events
-        scored_replay(track).replay_events(event).linear_score=NaN;
-        scored_replay(track).replay_events(event).weighted_corr_score=NaN;
-        scored_replay(track).replay_events(event).spearman_score=NaN;
-        scored_replay(track).replay_events(event).spearman_p=NaN;
-        scored_replay(track).replay_events(event).path_score=NaN;
-        scored_replay(track).replay_events(event).path_score_normalised=NaN;
+        scored_replay(track).replay_events(event).(suffix)=NaN;
     end
 end
 
@@ -40,12 +35,14 @@ end
 if analysis_type(1) == 1
     for track = 1 : num_tracks
         for event = 1 : num_replay_events
+            scored_replay(track).replay_events(event).(suffix)=NaN;
+
             decoded_event = data(track).replay_events(event);
             if length(find(isnan(decoded_event.decoded_position)))>0 | length(decoded_event.timebins_centre)<5 | size(decoded_event.spikes,1)==0 %NaN or event too short
-                scored_replay(track).replay_events(event).linear_score=NaN;
+                scored_replay(track).replay_events(event).(suffix)=NaN;
             else
                 decoded_position=modify_decoding(decoded_event);  % make column zero if there aren't any spikes
-                [scored_replay(track).replay_events(event).linear_score,~] = line_fitting(decoded_position);
+                [scored_replay(track).replay_events(event).(suffix),~] = line_fitting(decoded_position);
             end
         end
     end
@@ -56,12 +53,13 @@ end
 if analysis_type(2) == 1
     for track = 1 : num_tracks
         for event = 1 : num_replay_events
+            scored_replay(track).replay_events(event).(suffix)=NaN;
             decoded_event = data(track).replay_events(event);
             if length(find(isnan(decoded_event.decoded_position)))>0 | length(decoded_event.timebins_centre)<5 | size(decoded_event.spikes,1)==0 %NaN or event too short
-                scored_replay(track).replay_events(event).weighted_corr_score=NaN;
+                scored_replay(track).replay_events(event).(suffix)=NaN;
             else
                 decoded_position=modify_decoding(decoded_event);  % make column zero if there aren't any spikes
-                scored_replay(track).replay_events(event).weighted_corr_score = weighted_correlation(decoded_position);
+                scored_replay(track).replay_events(event).(suffix) = weighted_correlation(decoded_position);
             end
         end
     end
@@ -72,11 +70,11 @@ if analysis_type(3) == 1
         for event = 1 : num_replay_events
             decoded_event = data(track).replay_events(event);
             if length(find(isnan(decoded_event.decoded_position)))>0 | length(decoded_event.timebins_centre)<5 | size(decoded_event.spikes,1)==0
-                scored_replay(track).replay_events(event).path_score=NaN;
+                scored_replay(track).replay_events(event).(suffix)=NaN;
             else
                 decoded_position=modify_decoding(decoded_event);  % make column zero if there aren't any spikes
-%                 [scored_replay(track).replay_events(event).path_score,~] = pacman(decoded_position);
-                [scored_replay(track).replay_events(event).path_score] = fast_pacman(decoded_position);
+%                 [scored_replay(track).replay_events(event).(suffix),~] = pacman(decoded_position);
+                [scored_replay(track).replay_events(event).(suffix)] = fast_pacman(decoded_position);
             end
         end
     end
@@ -86,6 +84,9 @@ end
 if analysis_type(4) == 1
     load extracted_place_fields_BAYESIAN
     for track = 1 : num_tracks
+        scored_replay(track).replay_events(event).spearman_score=NaN;
+        scored_replay(track).replay_events(event).spearman_p=NaN;
+
         sorted_place_fields=place_fields_BAYESIAN.track(track).sorted_good_cells;
         decoded_event = data(track).replay_events(event);
         for event = 1 : num_replay_events
@@ -100,17 +101,19 @@ if analysis_type(4) == 1
         end
     end
 end
-% "pacman" path finding normalised within 1 track
+% "pacman" path finding new
 if analysis_type(5) == 1
     for track = 1 : num_tracks
+        scored_replay(track).replay_events(event).(suffix)=NaN;
+
         for event = 1 : num_replay_events
             decoded_event = data(track).replay_events(event);
             if length(find(isnan(decoded_event.decoded_position)))>0 | length(decoded_event.timebins_centre)<5 | size(decoded_event.spikes,1)==0
-                scored_replay(track).replay_events(event).path_score_normalised=NaN;
+                scored_replay(track).replay_events(event).(suffix)=NaN;
             else
                 decoded_position=modify_decoding(decoded_event);  % make column zero if there aren't any spikes
-%                 [scored_replay(track).replay_events(event).path_score,~] = pacman(decoded_position);
-                [scored_replay(track).replay_events(event).path_score_normalised] = fast_pacman_path(decoded_position);
+%                 [scored_replay(track).replay_events(event).(suffix),~] = pacman(decoded_position);
+                [scored_replay(track).replay_events(event).(suffix)] = fast_pacman_path(decoded_position);
             end
         end
     end

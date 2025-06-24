@@ -1,11 +1,11 @@
-function [sorted_replay,time_range]=sort_replay_events(option,varargin)
+function [sorted_replay,time_range]=sort_replay_events(option,varargin,suffix)
 % option is [] if no reexposure, and a vector for reexposures, e.g. [ 1 3 ; 2 4 ]
 % varargin can be 'wcorr', 'spearman' ,'control_fixed_spike' or 'rate_detection_control'
 
 if isempty(varargin)
     load significant_replay_events;
 else
-    switch varargin{1}
+    switch varargin
         case 'wcorr'
             if exist('significant_replay_events_wcorr.mat')==2
                 load significant_replay_events_wcorr
@@ -26,11 +26,24 @@ else
                 disp('spearman not found, loading default')
                 load significant_replay_events;
             end
+        case 'path'
+            if exist(sprintf('significant_replay_events_%s.mat',suffix)) ==2
+                load(fullfile(pwd, sprintf('significant_replay_events_%s.mat',suffix)));
+            end
         case 'path_new'
             if exist('significant_replay_events_path_new.mat')==2
                 load(fullfile(pwd, 'significant_replay_events_path_new.mat'));
             elseif exist('significant_replay_events_path_new_individual_exposure.mat')==2
                 load(fillfile(pwd, 'significant_replay_events_path_new_individual_exposure.mat'));
+            else
+                disp('path_new not found, loading default')
+                load significant_replay_events;
+            end
+        case 'path_within'
+            if exist('significant_replay_events_path_within.mat')==2
+                load(fullfile(pwd, 'significant_replay_events_path_within.mat'));
+            elseif exist('significant_replay_events_path_within_individual_exposure.mat')==2
+                load(fillfile(pwd, 'significant_replay_events_path_within_individual_exposure.mat'));
             else
                 disp('path_new not found, loading default')
                 load significant_replay_events;
@@ -208,13 +221,13 @@ for track=1:number_of_tracks
     end
 end
 
-[sorted_replay(:).method]= deal(varargin{1});
+[sorted_replay(:).method]= deal(varargin);
 
 save time_range time_range
 if isempty(varargin)
     save sorted_replay sorted_replay
 else
-    switch varargin{1}
+    switch varargin
         case 'wcorr'
             save sorted_replay_wcorr sorted_replay
         case 'spearman'
@@ -224,7 +237,7 @@ else
         case 'rate_detection_control'
             save sorted_replay_wcorr_RATE sorted_replay
         otherwise
-            save sorted_replay sorted_replay
+            save(sprintf('sorted_replay_%s.mat'), 'sorted_replay')
     end
 end
 

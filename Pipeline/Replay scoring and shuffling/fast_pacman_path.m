@@ -9,12 +9,14 @@ function score=fast_pacman_path(decoded_event)
 if score1>score2;
     score=score1;
     maxsum=maxsum1;
+   
 else
     score=score2;
     maxsum=maxsum2;
+
 end  
 
-%score=score/size(decoded_event,2);  %normalise by number of time bins???????????
+score=score/size(decoded_event,2);  %normalise by number of time bins
 
 % score=score/(size(decoded_event,2)+sum(sum(decoded_event)));  
 % normalise by the sum of all posterior probabilities
@@ -41,7 +43,7 @@ function [normalised_score, maxsum]=maxsum_algorithm_with_path(matrix)
 
     score=maxsum(rows,cols);
 
-    % --- Path Reconstruction ---
+    % Path Reconstruction
     selected_grid_mask = zeros(rows, cols); % Initialize a grid to mark the path
     optimal_path_indices = []; % To store [row, col] of path cells
 
@@ -62,13 +64,14 @@ function [normalised_score, maxsum]=maxsum_algorithm_with_path(matrix)
         elseif c == 1 % If in the first column, must have come from above
             r = r - 1;
         else
-            if maxsum(r-1,c) >= maxsum(r,c-1) % Prefer 'up' in case of a tie (consistent with how max would choose if (r-1,c) was first arg)
-                r = r - 1; % Move up
+            if maxsum(r-1,c) >= maxsum(r,c-1) 
+                r = r - 1; 
             else
-                c = c - 1; % Move left
+                c = c - 1;
             end
         end
     end
     unselected_score = sum(matrix(selected_grid_mask == 0));
     normalised_score = score / unselected_score;
+
 end

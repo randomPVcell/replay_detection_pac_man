@@ -1,6 +1,6 @@
 %calculate whether the events are significant, based on shuffles
 
-function scored_replay=replay_significance_new(scored_replay, shuffle_type)  
+function scored_replay=replay_significance_new(scored_replay, shuffle_type,suffix)  
 %extracts the replay event's p value by comparing the replay score with the distrbution of shuffled scores
 %
 %scored_replay is a variable of replay scores, 
@@ -17,8 +17,8 @@ num_replay_events = length(scored_replay(1).replay_events);
             for s=1:num_shuffle_types
                 
                 scored_replay(track).replay_events(event).p_value_path_new(s)=...
-                    get_p_value(scored_replay(track).replay_events(event).path_score_normalised,...
-                    shuffle_type{s}.shuffled_track_path(track).replay_events(event).path_score_normalised);
+                    get_p_value(scored_replay(track).replay_events(event).(suffix),...
+                    shuffle_type{s}.shuffled_track(track).replay_events(event).(suffix));
             end
         end
     end

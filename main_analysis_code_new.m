@@ -10,53 +10,64 @@ folders = {'2019-06-20_09-55-42' 'N-BLU_Day7_Ctrl-16x30_no_reexp' 'N-BLU_Day8_Ct
 % folders = {'RAT4_2019-06-15_10-46-59' 'RAT4_2019-06-19_10-00-07' 'RAT5_2019-06-24_10-43-24' 'RAT5_2019-06-26_10-27-15'};
 BAYSESIAN_NORMALIZED_ACROSS_TRACKS = 0 % Normalised within tracks
 % BAYSESIAN_NORMALIZED_ACROSS_TRACKS = 1 % Normalised across tracks
-% ground_truth_replay_sequence_analysis_new_2(folders,BAYSESIAN_NORMALIZED_ACROSS_TRACKS)
+%
+
+suffix = 'path_within'
+%ground_truth_replay_sequence_analysis_new_addon(folders,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix)
 %%%% extract replay and log odds info
-%shuffles={'PRE spike_train_circular_shift','PRE place_field_circular_shift','POST place bin circular shift','POST time bin circular shift','POST time bin permutation'};
-shuffles={'PRE place_field_circular_shift', 'POST time bin circular shift'};
+%
+ground_truth_log_odd_analysis_new(folders,0.02,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix);
 %% 
+
+shuffles={'PRE spike_train_circular_shift','PRE place_field_circular_shift','POST place bin circular shift','POST time bin permutation'};
+%% 
+
 cd(workingDir)
+shuffles={'POST place bin circular shift'};
 
 % Spike shuffle
-[log_odd] = extract_ground_truth_info_path(folders,'original','path_new',shuffles{1},3,2.1)
+[log_odd] = extract_ground_truth_info_path(folders,'original','path',shuffles{1},3,2.1,suffix)
 disp(pwd);
 %% 
 
 cd(workingDir)
 cd ground_truth_original
 
-save log_odd_path_normalised_place_field_circular_shift log_odd
+save(sprintf('log_odd_%s_place_bin_circular_shift',suffix), 'log_odd');
 %% 
+workingDir = 'D:\public-archivedwl-90\Dropbo_data8';
 
 cd(workingDir)
 
-[log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path_new',shuffles{1},3,2.1)
+[log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path',shuffles{1},3,2.1,suffix)
 cd(workingDir)
 
 cd ground_truth_original
-save log_odd_path_normalised_place_field_circular_shift_global_remapped log_odd
+save(sprintf('log_odd_%s_place_bin_circular_shift_globall_remapped',suffix), 'log_odd');
 cd ..
 %
 %% 
-cd(workingDir)
+workingDir = 'D:\public-archivedwl-90\Dropbo_data8';
 
+cd(workingDir)
 %%%% two shuffles
 shuffles = 'PRE place and POST time';
 % Spike shuffle
-[log_odd] = extract_ground_truth_info_path2(folders,'original','path_new',shuffles,3,2.1)
+[log_odd] = extract_ground_truth_info_path(folders,'original','path',shuffles,3,2.1,suffix)
 %% 
 cd(workingDir)
 cd ground_truth_original
-save log_odd_path_normalised_PRE_pace_POST_time_2 log_odd
+save(sprintf('log_odd_%s_PRE_place_POST_time.mat', suffix), 'log_odd');
 %% 
 %
 cd(workingDir)
+shuffles = 'PRE place and POST time';
 
-[log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path_new',shuffles,3,2.1)
+[log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path',shuffles,3,2.1,suffix)
 
 cd(workingDir)
 cd ground_truth_original
-save log_odd_path_normalised_PRE_place_POST_time_global_remapped_2 log_odd
+save(sprintf('log_odd_%s_PRE_place_POST_time_global_remapped.mat', suffix), 'log_odd');
 cd ..
 %
 % %%%%% three shufles
@@ -229,7 +240,8 @@ plot_ground_truth_compare_jump_distance(folders,option,method)
 % % plot_ground_truth_jump_distance_replay_quality(folders,option,method)
 
 %% The effect of shuffle
-clear all
+workingDir = 'D:\public-archivedwl-90\Dropbo_data8';
+
 % workingDir = 'D:\ground_truth_replay_analysis\Dropbo_data8_normalised_within';
 cd(workingDir)
 
@@ -241,20 +253,21 @@ option = 'common';
 % method = {'wcorr','spearman','linear','path'};
 
 % method = {'time shuffle','place shuffle','place field shuffle','spike shuffle'};
-method = {'spike shuffle','place field shuffle','place shuffle','time shuffle'};
-plot_ground_truth_compare_single_shuffle(folders,option,method)
+%method = {'spike shuffle','place field shuffle','place shuffle','time shuffle'};
+%plot_ground_truth_compare_single_shuffle(folders,option,method)
 
 
 % method = {'three shuffles','two PRE shuffles','PRE place POST place','PRE place POST time','two POST','place bin circular shift'};
-method = {'place bin circular shift','wcorr 1 shuffle + jump distance','two POST','PRE place POST time','PRE place POST place','two PRE shuffles','three shuffles'};
-plot_ground_truth_compare_shuffles(folders,option,method)
+method = {'wcorr','spearman',...
+    'linear', 'path_normalised'};
+plot_ground_truth_compare_shuffles_modified(folders,option,method)
 
 
 %% Method optimisation
 
-clear all
+
 % workingDir = 'D:\ground_truth_replay_analysis\Dropbo_data8_normalised_within';
-workingDir = 'P:\ground_truth_replay_analysis\Dropbo_data8';
+
 cd(workingDir)
 
 % folders = { '2019-06-20_09-55-42' 'N-BLU_Day7_Ctrl-16x30_no_reexp' 'N-BLU_Day8_Ctrl-15-NoRest-15' 'Q-BLU_Day2_RateRemap' 'Q-BLU_Day3_RateRemap'};
@@ -262,10 +275,10 @@ folders = {'2019-06-20_09-55-42' 'N-BLU_Day7_Ctrl-16x30_no_reexp' 'N-BLU_Day8_Ct
     'RAT1_2018-10-05_09-42-15' 'RAT4_2019-06-15_10-46-59' 'RAT4_2019-06-19_10-00-07' 'RAT5_2019-06-24_10-43-24' 'RAT5_2019-06-26_10-27-15'};
 option = 'common';
 % method = {'wcorr','spearman','linear'};
-method = {'wcorr 1 shuffle','wcorr 1 shuffle + jump distance','wcorr 2 shuffles','wcorr 3 shuffles'...
-    'spearman median spike','spearman all spikes',...
-    'linear 1 shuffle','linear 2 shuffles'};
-plot_ground_truth_optimisation(folders,option,method)
+method = {'wcorr 2 shuffles','spearman all spikes',...
+    'linear 2 shuffles', 'path_new 2 shuffles'};
+plot_ground_truth_optimisation_modified(folders,option,method)
+%% 
 
 methods = {'wcorr 1 shuffle','wcorr 1 shuffle + jump distance','wcorr 2 shuffles','wcorr 3 shuffles'...
     'spearman median spike','spearman all spikes',...

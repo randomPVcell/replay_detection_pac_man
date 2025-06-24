@@ -1,4 +1,4 @@
-function shuffled_track = ground_truth_run_shuffles(shuffle_choice,analysis_type,num_shuffles,decoded_replay_events,place_fields_BAYESIAN,BAYSESIAN_NORMALIZED_ACROSS_TRACKS)
+function shuffled_track = ground_truth_run_shuffles(shuffle_choice,analysis_type,num_shuffles,decoded_replay_events,place_fields_BAYESIAN,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix)
 % computes shuffles on replay events
 % shuffle_choice- determines what type of shuffles will be performed, entered as a string
 %
@@ -55,7 +55,6 @@ for s=1:num_shuffles
     %%%%%%%%
     %%%POST time bin circular shift
     %%%%%%%        
-    
     elseif strcmp(shuffle_choice, 'POST time bin circular shift') %
         % For each shuffle, creates a new structure where the time bins within each position bin in each decoded event have been shuffled
         for track = 1 : num_tracks
@@ -197,12 +196,12 @@ for s=1:num_shuffles
         end
     end
     %score replay for decoded events with shuffled place fields
-    shuffle_output=replay_scoring_new(shuffled_struct,analysis_type);  %don't do shuffle for spearman
+    shuffle_output=replay_scoring_new(shuffled_struct,analysis_type,suffix);  %don't do shuffle for spearman
     for track = 1 : num_tracks
         for event = 1: num_replay_events
             %shuffled_track(track).replay_events(event).linear_score(s) = shuffle_output(track).replay_events(event).linear_score;
             %shuffled_track(track).replay_events(event).weighted_corr_score(s) = shuffle_output(track).replay_events(event).weighted_corr_score;
-            shuffled_track(track).replay_events(event).path_score_normalised(s) = shuffle_output(track).replay_events(event).path_score_normalised;
+            shuffled_track(track).replay_events(event).(suffix)(s) = shuffle_output(track).replay_events(event).(suffix);
         end
         
     end

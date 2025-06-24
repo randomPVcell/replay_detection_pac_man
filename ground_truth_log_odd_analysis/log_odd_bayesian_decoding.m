@@ -176,7 +176,7 @@ end
 all_place_fields = [];
 
 if isnumeric(posbin) && ~isempty(posbin) % If the size of the position bin specified
-    load Track_fields
+    load(fullfile(pwd, 'Track_fields.mat'));
     if isempty(modify) % Original data
 %         Track 1 and Track 2 place fields concatenated into one
         all_place_fields{1} = [Track_fields(1).mean_rate(:,place_field_index)' Track_fields(2).mean_rate(:,place_field_index)'];
@@ -392,7 +392,7 @@ elseif strcmp(modify,'global remapping')
         
     elseif strcmp(modify,'rate remapping')
         cd 'rate_remapped'
-        load extracted_place_fields_BAYESIAN
+        load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'));
         cd ..
         
         for track_id = 1:2
@@ -429,8 +429,8 @@ elseif strcmp(modify,'global remapping')
     end
 end
 
-load decoded_replay_events
-load decoded_replay_events_segments
+load(fullfile(pwd, 'decoded_replay_events.mat'));
+load(fullfile(pwd, 'decoded_replay_events_segments.mat'));
 % Apply formula of bayesian decoding
 replay_id = bayesian_spike_count.replay_events_indices;
 
