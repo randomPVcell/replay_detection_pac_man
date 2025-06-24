@@ -252,7 +252,7 @@ for f = 1
     for shuffle = 1:3
         load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
 
-      %{
+      
   % Sequence decoding
         estimated_sequence_global_remapped = bayesian_decoding_ground_truth(...
             place_fields_BAYESIAN,'replayEvents_bayesian_spike_count','global_remapped',BAYSESIAN_NORMALIZED_ACROSS_TRACKS,'N');
@@ -269,7 +269,7 @@ for f = 1
         if ~isfolder(shuffle_folder)
             mkdir(shuffle_folder)
         end
-
+%{
         cd ..
         cd global_remapped_shuffles
         cd(shuffle_folder)
@@ -341,7 +341,7 @@ for f = 1
 
         %if exist(fullfile(pwd, sprintf('scored_replay_segments_%s.mat',suffix)), 'file')~= 2
 
-            cd ..
+            %cd ..
             cd ..
 
             replay_decoding_split_events;
@@ -369,6 +369,7 @@ for f = 1
         cd(shuffle_folder)
         %if exist(fullfile(pwd, sprintf('shuffled_tracks_segments_%s.mat', suffix)), 'file') ~= 2
             tic
+            disp("processing segments")
             p = gcp; % Starting new parallel pool
             if ~isempty(p)
                 for shuffle_id=1:length(shuffle_choice)
