@@ -206,38 +206,38 @@ for f = 1
 
 
     % global remapped 20ms (remapping good cells within track)
-%{   
+   
     for shuffle = 1:3
 
         global_remapped_place_fields_id = [];
         bayesian_spike_count = 'replayEvents_bayesian_spike_count';
+        load(fullfile(pwd, 'global_remapped_place_fields_id.mat'), 'global_remapped_place_fields_id');
 
         for event = 1:length(replay_events)
             % global remapping by swapping the Cell ID for good cells
-            global_remapped_place_fields = [];
+            
 
-
-            for track_id = 1:2
+            %for track_id = 1:2
                 
-                global_remapped_place_fields{track_id} = place_fields_BAYESIAN.track(track_id).raw;
+            %    global_remapped_place_fields{track_id} = place_fields_BAYESIAN.track(track_id).raw;
 
-                random_cell_index = randperm(length(place_fields_BAYESIAN.track(track_id).sorted_good_cells));
-                random_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells(random_cell_index);
+            %    random_cell_index = randperm(length(place_fields_BAYESIAN.track(track_id).sorted_good_cells));
+            %    random_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells(random_cell_index);
                 %                         place_fields_BAYESIAN.track(track_id).random_cell = random_cell;
-                original_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells;
+            %    original_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells;
 
-                for j=1:length(random_cell) %only swap good cells
-                    global_remapped_place_fields{track_id}{original_cell(j)}=place_fields_BAYESIAN.track(track_id).raw{random_cell(j)};
-                end
+            %    for j=1:length(random_cell) %only swap good cells
+            %        global_remapped_place_fields{track_id}{original_cell(j)}=place_fields_BAYESIAN.track(track_id).raw{random_cell(j)};
+            %    end
 
-                place_fields_BAYESIAN.track(track_id).global_remapped{event} = global_remapped_place_fields{track_id};
+            %    place_fields_BAYESIAN.track(track_id).global_remapped{event} = global_remapped_place_fields{track_id};
 
                 % Also save the shuffled place cell id for subsequent spearsman
                 % analysis
-                global_remapped_place_fields_id{event}{track_id}(1,:) = original_cell;
-                global_remapped_place_fields_id{event}{track_id}(2,:) = random_cell;
+            %    global_remapped_place_fields_id{event}{track_id}(1,:) = original_cell;
+            %    global_remapped_place_fields_id{event}{track_id}(2,:) = random_cell;
                 
-            end
+            %end
 
         end
 
@@ -247,9 +247,9 @@ for f = 1
         save extracted_place_fields_BAYESIAN place_fields_BAYESIAN
 
     end
-%}
+
       
-    for shuffle = 1:3
+    for shuffle = 1
         load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
 
       
@@ -269,7 +269,6 @@ for f = 1
         if ~isfolder(shuffle_folder)
             mkdir(shuffle_folder)
         end
-%{
         cd ..
         cd global_remapped_shuffles
         cd(shuffle_folder)
@@ -277,18 +276,18 @@ for f = 1
         % But also already saved in main folder
         load(fullfile(pwd, 'global_remapped_place_fields_id.mat'), 'global_remapped_place_fields_id');
         load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
-
+       
         cd ..
         cd ..
 
         for j = 1:length(place_fields_BAYESIAN.track)
-            decoded_replay_events(j).replay_events = replay_events;
+            decoded_replay_events(j).replay_events = replay_events(1:100);
         end
 
 
         % Save in structure
         for j = 1:length(place_fields_BAYESIAN.track)
-            for i = 1:length(estimated_sequence_global_remapped(1).replay_events)
+            for i = 1:length(estimated_sequence_global_remapped(1).replay_events(1:100))
                 decoded_replay_events(j).replay_events(i).timebins_edges = estimated_sequence_global_remapped(j).replay_events(i).replay_time_edges;
                 decoded_replay_events(j).replay_events(i).timebins_centre = estimated_sequence_global_remapped(j).replay_events(i).replay_time_centered;
                 decoded_replay_events(j).replay_events(i).timebins_index = 1:length(estimated_sequence_global_remapped(j).replay_events(i).replay_time_centered);
@@ -303,7 +302,7 @@ for f = 1
        % if exist(fullfile(pwd, sprintf('shuffled_tracks_%s.mat', suffix)), 'file') ~= 2
             
             disp(sprintf('running shuffles %s',shuffle));
-            num_shuffles=1000;
+            num_shuffles=100;
             analysis_type=[0 0 1 0 0];  %just linear fit, weighted correlation and pacman
             p = gcp; % Starting new parallel pool
             tic
@@ -334,14 +333,13 @@ for f = 1
         scored_replay = replay_significance_new(scored_replay, shuffle_type,suffix);
         save(sprintf('scored_replay_%s.mat',suffix), 'scored_replay');
         clear scored_replay decoded_replay_events shuffle_type estimated_sequence_global_remapped
-
-      %}    
+ 
         %%%%%%analyze segments%%%%%%%%%%
         %splitting replay events
 
         %if exist(fullfile(pwd, sprintf('scored_replay_segments_%s.mat',suffix)), 'file')~= 2
 
-            %cd ..
+            cd ..
             cd ..
 
             replay_decoding_split_events;

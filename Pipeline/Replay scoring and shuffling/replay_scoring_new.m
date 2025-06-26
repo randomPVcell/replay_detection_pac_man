@@ -67,7 +67,7 @@ end
 % "pacman" path finding
 if analysis_type(3) == 1
     for track = 1 : num_tracks
-        for event = 1 : num_replay_events
+        for event = 1 : 100
             decoded_event = data(track).replay_events(event);
             if length(find(isnan(decoded_event.decoded_position)))>0 | length(decoded_event.timebins_centre)<5 | size(decoded_event.spikes,1)==0
                 scored_replay(track).replay_events(event).(suffix)=NaN;

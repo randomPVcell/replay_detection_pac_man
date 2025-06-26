@@ -144,8 +144,10 @@ for f = 1:10
                 shuffled_data = log(T1_T2_ratio_shuffled);
                 tempt = (data-mean(shuffled_data))/std(shuffled_data);
                 log_odd.normal_zscored.original(track,c) = tempt;
-
-
+             
+           
+                fprintf('\n--- Debugging Z-Score for Event (f=%d, nfolders=%d, i=%d, track=%d) ---\n', f, nfolders, i, track);
+              
                 % Common 20ms
                 %                 log_odd.common.probability_ratio(c) = probability_ratio_common_good{1}(track,log_odd.index(c),log_odd.segment_id(c));
                 log_odd.common.T1_T2_ratio(track,c) = probability_ratio_common_good{1}(1,log_odd.index(c),log_odd.segment_id(track,c));
@@ -294,7 +296,7 @@ for f = 1:10
                     tempt = (data-mean(shuffled_data))/std(shuffled_data);
                     log_odd.normal_zscored.([option,'_original'])(track,c) = tempt;
 
-
+                    
                     % Common 20ms
                     %                 log_odd.common.probability_ratio(c) = probability_ratio_common_good{1}(track,log_odd.index(c),log_odd.segment_id(c));
                     log_odd.common.([option,'_T1_T2_ratio'])(track,c) = probability_ratio_common_good{nfolders}{1}(1,log_odd.index(c),log_odd.segment_id(track,c));

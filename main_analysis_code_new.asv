@@ -16,7 +16,7 @@ suffix = 'path_within_new'
 %ground_truth_replay_sequence_analysis_new_addon(folders,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix)
 %%%% extract replay and log odds info
 %
-ground_truth_log_odd_analysis_new(folders,0.02,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix);
+ground_truth_log_odd_analysis _new(folders,0.02,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix);
 %% 
 
 shuffles={'PRE spike_train_circular_shift','PRE place_field_circular_shift','POST place bin circular shift','POST time bin permutation'};
@@ -47,26 +47,23 @@ save(sprintf('log_odd_%s_place_bin_circular_shift_globall_remapped',suffix), 'lo
 cd ..
 %
 %% 
-
 workingDir = 'D:\public-archivedwl-90\Dropbo_data8';
-suffix = 'path_within';
+
 cd(workingDir)
 %%%% two shuffles
 shuffles = 'PRE place and POST time';
 % Spike shuffle
-[log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path',shuffles,3,2.1,suffix)
+[log_odd] = extract_ground_truth_info_path(folders,'original','path',shuffles,3,2.1,suffix)
 %% 
 cd(workingDir)
 cd ground_truth_original
 save(sprintf('log_odd_%s_PRE_place_POST_time.mat', suffix), 'log_odd');
 %% 
 %
-
 cd(workingDir)
 shuffles = 'PRE place and POST time';
-suffix = 'path_within';
+
 [log_odd] = extract_ground_truth_info_path(folders,'global_remapped','path',shuffles,3,2.1,suffix)
-%% 
 
 cd(workingDir)
 cd ground_truth_original
