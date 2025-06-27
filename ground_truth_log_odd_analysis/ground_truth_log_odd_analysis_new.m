@@ -19,7 +19,7 @@ c = 1;
 current_directory=pwd;
 load subsets_of_cells;
 
-for f = 1
+for f = 2
     cd Tables
     disp(f);
     load subsets_of_cells;
@@ -208,49 +208,51 @@ for f = 1
     % global remapped 20ms (remapping good cells within track)
    
     for shuffle = 1:3
-
+        cd global_remapped_shuffles
+        shuffle_folder = sprintf('shuffle_%i',shuffle);
+        cd(shuffle_folder)
         global_remapped_place_fields_id = [];
         bayesian_spike_count = 'replayEvents_bayesian_spike_count';
+% 1. Load the global_remapped_place_fields_id ONLY ONCE, before the main 'event' loop.
         load(fullfile(pwd, 'global_remapped_place_fields_id.mat'), 'global_remapped_place_fields_id');
 
         for event = 1:length(replay_events)
-            % global remapping by swapping the Cell ID for good cells
-            
-
-            %for track_id = 1:2
+            global_remapped_place_fields = []; % Re-initialize for each event
+        
+            for track_id = 1:2
+                original_cell = global_remapped_place_fields_id{event}{track_id}(1,:);
+                random_cell = global_remapped_place_fields_id{event}{track_id}(2,:);
                 
-            %    global_remapped_place_fields{track_id} = place_fields_BAYESIAN.track(track_id).raw;
+                global_remapped_place_fields{track_id} = place_fields_BAYESIAN.track(track_id).raw; % Added semicolon
+        
+                for j=1:length(random_cell) 
+                    global_remapped_place_fields{track_id}{original_cell(j)}=place_fields_BAYESIAN.track(track_id).raw{random_cell(j)};
+                end
+                
+                % Store the resulting remapped place fields for the current event.
+                place_fields_BAYESIAN.track(track_id).global_remapped{event} = global_remapped_place_fields{track_id};
+                
+             end
 
-            %    random_cell_index = randperm(length(place_fields_BAYESIAN.track(track_id).sorted_good_cells));
-            %    random_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells(random_cell_index);
-                %                         place_fields_BAYESIAN.track(track_id).random_cell = random_cell;
-            %    original_cell = place_fields_BAYESIAN.track(track_id).sorted_good_cells;
-
-            %    for j=1:length(random_cell) %only swap good cells
-            %        global_remapped_place_fields{track_id}{original_cell(j)}=place_fields_BAYESIAN.track(track_id).raw{random_cell(j)};
-            %    end
-
-            %    place_fields_BAYESIAN.track(track_id).global_remapped{event} = global_remapped_place_fields{track_id};
 
                 % Also save the shuffled place cell id for subsequent spearsman
                 % analysis
             %    global_remapped_place_fields_id{event}{track_id}(1,:) = original_cell;
             %    global_remapped_place_fields_id{event}{track_id}(2,:) = random_cell;
                 
-            %end
-
         end
+           
+        cd ..
+        cd ..
 
         % extracted_place_fields_BAYESIAN saved in the main folder
         global_remapped_original_probability_ratio = [];
         global_remapped_common_good_probability_ratio = [];
         save extracted_place_fields_BAYESIAN place_fields_BAYESIAN
 
-    end
+ 
 
       
-    for shuffle = 1
-        load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
 
       
   % Sequence decoding
@@ -264,30 +266,25 @@ for f = 1
 
         cd global_remapped_shuffles
 
-        shuffle_folder = sprintf('shuffle_%i',shuffle);
 
         if ~isfolder(shuffle_folder)
             mkdir(shuffle_folder)
         end
-        cd ..
-        cd global_remapped_shuffles
-        cd(shuffle_folder)
+        
         % cell id shuffled place field variables saved in shuffle folder
         % But also already saved in main folder
-        load(fullfile(pwd, 'global_remapped_place_fields_id.mat'), 'global_remapped_place_fields_id');
-        load(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
+        cd (shuffle_folder)
+        save(fullfile(pwd, 'extracted_place_fields_BAYESIAN.mat'), 'place_fields_BAYESIAN');
        
-        cd ..
-        cd ..
-
+       
         for j = 1:length(place_fields_BAYESIAN.track)
-            decoded_replay_events(j).replay_events = replay_events(1:100);
+            decoded_replay_events(j).replay_events = replay_events;
         end
 
 
         % Save in structure
         for j = 1:length(place_fields_BAYESIAN.track)
-            for i = 1:length(estimated_sequence_global_remapped(1).replay_events(1:100))
+            for i = 1:length(estimated_sequence_global_remapped(1).replay_events)
                 decoded_replay_events(j).replay_events(i).timebins_edges = estimated_sequence_global_remapped(j).replay_events(i).replay_time_edges;
                 decoded_replay_events(j).replay_events(i).timebins_centre = estimated_sequence_global_remapped(j).replay_events(i).replay_time_centered;
                 decoded_replay_events(j).replay_events(i).timebins_index = 1:length(estimated_sequence_global_remapped(j).replay_events(i).replay_time_centered);
@@ -296,13 +293,12 @@ for f = 1
         end
 
         scored_replay = replay_scoring_new(decoded_replay_events,[0 0 1 0 0],suffix);
-        cd global_remapped_shuffles
-        cd(shuffle_folder)
+      
         % RUN SHUFFLES
        % if exist(fullfile(pwd, sprintf('shuffled_tracks_%s.mat', suffix)), 'file') ~= 2
             
             disp(sprintf('running shuffles %s',shuffle));
-            num_shuffles=100;
+            num_shuffles=1000;
             analysis_type=[0 0 1 0 0];  %just linear fit, weighted correlation and pacman
             p = gcp; % Starting new parallel pool
             tic
@@ -339,32 +335,27 @@ for f = 1
 
         %if exist(fullfile(pwd, sprintf('scored_replay_segments_%s.mat',suffix)), 'file')~= 2
 
-            cd ..
-            cd ..
 
             replay_decoding_split_events;
             load decoded_replay_events_segments;
     
             scored_replay1_path = replay_scoring_new(decoded_replay_events1,[0 0 1 0 0],suffix);
             scored_replay2_path = replay_scoring_new(decoded_replay_events2,[0 0 1 0 0],suffix);
-            cd global_remapped_shuffles
-            cd(shuffle_folder)
+            
             save(sprintf('scored_replay_segments_%s.mat',suffix), 'scored_replay1_path', 'scored_replay2_path');
         %else
         
          %   load(fullfile(pwd, sprintf('scored_replay_segments_%s.mat',suffix)));
    
         %end
-        cd ..
-        cd ..
+       
 
         num_shuffles=1000;
         analysis_type=[0 0 1 0 0];  %just weighted correlation and pacman
         shuffle_choice={'PRE spike_train_circular_shift','PRE place_field_circular_shift', 'POST place bin circular shift','POST time bin permutation'};
         %shuffle_choice = {'POST time bin permutation'};
         load decoded_replay_events_segments;
-        cd global_remapped_shuffles
-        cd(shuffle_folder)
+        
         %if exist(fullfile(pwd, sprintf('shuffled_tracks_segments_%s.mat', suffix)), 'file') ~= 2
             tic
             disp("processing segments")
@@ -521,7 +512,7 @@ for f = 1
 
     end
         cd(current_directory)
-
+end
 end
 
 

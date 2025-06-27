@@ -64,7 +64,7 @@ end
 %%%%% BAYESIAN DECODING  %%%%%%
 for track_id=1:length(place_fields_BAYESIAN.track)   % wwhere is track id =1??? 
     % Creates a vector of position bins and finds centre
-    position_bin_edges = place_fields_BAYESIAN.track(track_id).x_bin_edges;
+    position_bin_edges = place_fields_BAY1ESIAN.track(track_id).x_bin_edges;
     estimated_position(track_id).position_bin_centres = place_fields_BAYESIAN.track(track_id).x_bin_centres;
     
     % Bin position for decoding error

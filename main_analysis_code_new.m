@@ -12,7 +12,7 @@ BAYSESIAN_NORMALIZED_ACROSS_TRACKS = 0 % Normalised within tracks
 % BAYSESIAN_NORMALIZED_ACROSS_TRACKS = 1 % Normalised across tracks
 %
 
-suffix = 'path_within_new'
+suffix = 'path_within'
 %ground_truth_replay_sequence_analysis_new_addon(folders,BAYSESIAN_NORMALIZED_ACROSS_TRACKS,suffix)
 %%%% extract replay and log odds info
 %

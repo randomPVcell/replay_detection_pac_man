@@ -115,7 +115,7 @@ for s=1:num_shuffles
         
         replay_events_spike_count = spike_count_structure.n.replay;
         % For each replay event, takes spike count matrix and does circular shuffle on the spikes of each cell
-        for event = 1 : 100
+        for event = 1 : length(replayEvents_bayesian_spike_count.replay_events)
             thisReplay_indxs = find(replay_indices == event);
             index=decoded_replay_events(1).replay_events(event).timebins_index;  %index is needed when analyzing segments of replay event, same value across all tracks
             for i=1:size(replay_events_spike_count,1)
